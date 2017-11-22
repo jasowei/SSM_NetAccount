@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/mvc
+       http://www.springframework.org/schema/mvc/spring-mvc.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd
+       ">
+
+    <!--附 : 注入hibernate校验对象-->
+    <bean class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"
+          id="validatorFactoryBean">
+        <!--声明输入验证的提供者是hibernate-->
+        <property name="providerClass" value="org.hibernate.validator.HibernateValidator"/>
+    </bean>
+
+    <!--附 : 配置登录拦截器-->
+    <mvc:interceptors>
+        <!--拦截器执行的顺序依照下面的加入顺序执行-->
+        <mvc:interceptor>
+            <!--要拦截的请求路径-->
+            <mvc:mapping path="/**"/>
+            <!--不拦截资源-->
+            <mvc:exclude-mapping path="/resources/**"/>
+            <mvc:exclude-mapping path="/user_admin/getVerifyCode"/>
+            <mvc:exclude-mapping path="/user_admin/login"/>
+            <mvc:exclude-mapping path="/user_admin/verifyEmail"/>
+            <mvc:exclude-mapping path="/user_admin/sendEmail"/>
+            <!--拦截器所对应的类路径-->
+            <bean class="com.lanou.user.Interceptor.AdminInterceptor"/>
+        </mvc:interceptor>
+    </mvc:interceptors>
+
+    <!--附 : 配置权限拦截器-->
+    <mvc:interceptors>
+        <!--拦截器执行的顺序依照下面的加入顺序执行-->
+        <mvc:interceptor>
+            <!--要拦截的请求路径-->
+            <mvc:mapping path="/**"/>
+            <!--不拦截资源-->
+            <mvc:exclude-mapping path="/resources/**"/>
+            <mvc:exclude-mapping path="/user_admin/getVerifyCode"/>
+            <mvc:exclude-mapping path="/user_admin/login"/>
+            <mvc:exclude-mapping path="/user_admin/verifyEmail"/>
+            <mvc:exclude-mapping path="/user_admin/sendEmail"/>
+            <!--拦截器所对应的类路径-->
+            <bean class="com.lanou.user.Interceptor.PrivilegeInterceptor"/>
+        </mvc:interceptor>
+    </mvc:interceptors>
+
+
+
+
+    <!--1. 加入注解扫描驱动&ndash;&gt;-->
+    <mvc:annotation-driven validator="validatorFactoryBean"/>
+    <!--<mvc:annotation-driven />-->
+
+    <!--2. 配置注解扫描的基础包-->
+    <context:component-scan base-package="com.lanou"/>
+
+    <!--3. springmvc第一条 : 将静态资源的处理经由Spring MVC框架交由Web应用服务器处理-->
+    <mvc:default-servlet-handler/>
+
+    <!--4. springmvc第二条 : 配置视图解析规则-->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <!--配置视图解析的前缀-->
+        <property name="prefix" value="/WEB-INF/"/>
+        <!--配置视图解析的后缀-->
+        <property name="suffix" value=".jsp"/>
+    </bean>
+
+
+
+
+</beans>
